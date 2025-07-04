@@ -34,7 +34,6 @@ type Response struct {
 	} `json:"choices"`
 }
 
-type Client
 type Client struct {
 	token string
 }
