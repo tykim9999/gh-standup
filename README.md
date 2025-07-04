@@ -51,7 +51,7 @@ gh standup --repo owner/repo
 gh standup --days 3
 
 # Use a different AI model
-gh standup --model anthropic/claude-3.5-sonnet
+gh standup --model xai/grok-3-mini
 
 # Combine options
 gh standup --user octocat --repo microsoft/vscode --days 2 --model openai/gpt-4o
