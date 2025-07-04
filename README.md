@@ -14,7 +14,7 @@ A GitHub CLI extension that generates AI-powered standup reports using GitHub ac
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/gh-standup.git
+git clone https://github.com/sgoedecke/gh-standup.git
 cd gh-standup
 
 # Build and install
@@ -25,7 +25,7 @@ gh extension install .
 ### Install from GitHub
 
 ```bash
-gh extension install your-username/gh-standup
+gh extension install sgoedecke/gh-standup
 ```
 
 ## Usage
