@@ -2,6 +2,7 @@ package llm
 
 import (
 	"bytes"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,7 +12,29 @@ import (
 
 	"github.com/cli/go-gh/v2/pkg/auth"
 	"github.com/gh-standup/internal/types"
+	"gopkg.in/yaml.v3"
 )
+
+//go:embed standup.prompt.yml
+var standupPromptYAML []byte
+
+type PromptConfig struct {
+	Name            string          `yaml:"name"`
+	Description     string          `yaml:"description"`
+	Model           string          `yaml:"model"`
+	ModelParameters ModelParameters `yaml:"modelParameters"`
+	Messages        []PromptMessage `yaml:"messages"`
+}
+
+type ModelParameters struct {
+	Temperature float64 `yaml:"temperature"`
+	TopP        float64 `yaml:"topP"`
+}
+
+type PromptMessage struct {
+	Role    string `yaml:"role"`
+	Content string `yaml:"content"`
+}
 
 type Request struct {
 	Messages    []Message `json:"messages"`
@@ -53,45 +76,56 @@ func NewClient() (*Client, error) {
 	return &Client{token: token}, nil
 }
 
+func loadPromptConfig() (*PromptConfig, error) {
+	var config PromptConfig
+	err := yaml.Unmarshal(standupPromptYAML, &config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse prompt configuration: %w", err)
+	}
+	return &config, nil
+}
+
 func (c *Client) GenerateStandupReport(activities []types.GitHubActivity, model string) (string, error) {
 	fmt.Print("  Formatting activity data for AI... ")
 	activitySummary := c.formatActivitiesForLLM(activities)
 	fmt.Println("Done")
 
-	// Create the system prompt
-	systemPrompt := `You are an AI assistant helping to generate professional standup reports based on GitHub activity. 
+	fmt.Print("  Loading prompt configuration... ")
+	promptConfig, err := loadPromptConfig()
+	if err != nil {
+		fmt.Println("Failed")
+		return "", err
+	}
+	fmt.Println("Done")
 
-Your task is to create a concise, well-structured standup report that summarizes the developer's work from the previous day(s). The report should be written in first person and include:
+	// Use the model from parameter or fall back to config
+	selectedModel := model
+	if selectedModel == "" {
+		selectedModel = promptConfig.Model
+	}
 
-1. **Yesterday's Accomplishments**: What was completed/worked on
-2. **Today's Plans**: Logical next steps based on the activity (be realistic)
-3. **Blockers/Challenges**: Any potential issues or dependencies mentioned
+	// Build messages from the prompt config, replacing template variables
+	messages := make([]Message, len(promptConfig.Messages))
+	for i, msg := range promptConfig.Messages {
+		content := msg.Content
+		// Replace the {{activities}} template variable
+		content = strings.ReplaceAll(content, "{{activities}}", activitySummary)
 
-Guidelines:
-- Keep it professional but conversational
-- Focus on meaningful work rather than trivial commits
-- Group related activities together
-- Highlight significant contributions like new features, bug fixes, or reviews
-- Be concise but informative
-- Use bullet points for clarity
-- Avoid technical jargon that non-developers wouldn't understand
-
-Format the output as a clean, readable report without any markdown headers.`
-
-	userPrompt := fmt.Sprintf("Based on the following GitHub activity, generate a standup report:\n\n%s", activitySummary)
+		messages[i] = Message{
+			Role:    msg.Role,
+			Content: content,
+		}
+	}
 
 	request := Request{
-		Messages: []Message{
-			{Role: "system", Content: systemPrompt},
-			{Role: "user", Content: userPrompt},
-		},
-		Model:       model,
-		Temperature: 0.7,
-		TopP:        1.0,
+		Messages:    messages,
+		Model:       selectedModel,
+		Temperature: promptConfig.ModelParameters.Temperature,
+		TopP:        promptConfig.ModelParameters.TopP,
 		Stream:      false,
 	}
 
-	fmt.Printf("  Calling GitHub Models API (%s)... ", model)
+	fmt.Printf("  Calling GitHub Models API (%s)... ", selectedModel)
 	response, err := c.callGitHubModels(request)
 	if err != nil {
 		fmt.Println("Failed")
