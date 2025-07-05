@@ -1,6 +1,6 @@
 # gh-standup
 
-A GitHub CLI extension that generates AI-powered standup reports using GitHub activity data. It uses free [GitHub Models](https://docs.github.com/en/github-models) for inference.
+A GitHub CLI extension that generates AI-powered standup reports using GitHub activity data. It uses free [GitHub Models](https://docs.github.com/en/github-models) for inference, so you don't need to do any token setup - your existing GitHub CLI token will do fine!
 
 ## Installation
 
