@@ -10,7 +10,7 @@ import (
 
 func TestFormatActivitiesForLLM(t *testing.T) {
 	client := &Client{}
-	
+
 	activities := []types.GitHubActivity{
 		{
 			Type:        "commit",

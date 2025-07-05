@@ -62,7 +62,7 @@ func runStandup(cmd *cobra.Command, args []string) error {
 	endDate := time.Now()
 	startDate := endDate.AddDate(0, 0, -flagDays)
 
-	fmt.Printf("Analyzing GitHub activity for %s (%s to %s)\n", 
+	fmt.Printf("Analyzing GitHub activity for %s (%s to %s)\n",
 		flagUser, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
 
 	fmt.Print("Collecting GitHub activity data...\n")

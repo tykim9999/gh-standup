@@ -21,7 +21,7 @@ func NewClient() (*Client, error) {
 		return nil, err
 	}
 	fmt.Println("Done")
-	
+
 	return &Client{client: client}, nil
 }
 
@@ -89,9 +89,9 @@ func (c *Client) getCommits(username, repo string, startDate, endDate time.Time)
 	var activities []types.GitHubActivity
 
 	// Search for commits by author
-	query := fmt.Sprintf("author:%s committer-date:%s..%s", 
+	query := fmt.Sprintf("author:%s committer-date:%s..%s",
 		username, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
-	
+
 	if repo != "" {
 		query += fmt.Sprintf(" repo:%s", repo)
 	}
@@ -139,19 +139,19 @@ func (c *Client) getPullRequests(username, repo string, startDate, endDate time.
 	var activities []types.GitHubActivity
 
 	// Search for pull requests
-	query := fmt.Sprintf("author:%s created:%s..%s", 
+	query := fmt.Sprintf("author:%s created:%s..%s",
 		username, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
-	
+
 	if repo != "" {
 		query += fmt.Sprintf(" repo:%s", repo)
 	}
 
 	var searchResult struct {
 		Items []struct {
-			Number int    `json:"number"`
-			Title  string `json:"title"`
-			Body   string `json:"body"`
-			State  string `json:"state"`
+			Number     int    `json:"number"`
+			Title      string `json:"title"`
+			Body       string `json:"body"`
+			State      string `json:"state"`
 			Repository struct {
 				FullName string `json:"full_name"`
 			} `json:"repository"`
@@ -184,19 +184,19 @@ func (c *Client) getIssues(username, repo string, startDate, endDate time.Time) 
 	var activities []types.GitHubActivity
 
 	// Search for issues created by user
-	query := fmt.Sprintf("author:%s created:%s..%s", 
+	query := fmt.Sprintf("author:%s created:%s..%s",
 		username, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
-	
+
 	if repo != "" {
 		query += fmt.Sprintf(" repo:%s", repo)
 	}
 
 	var searchResult struct {
 		Items []struct {
-			Number int    `json:"number"`
-			Title  string `json:"title"`
-			Body   string `json:"body"`
-			State  string `json:"state"`
+			Number     int    `json:"number"`
+			Title      string `json:"title"`
+			Body       string `json:"body"`
+			State      string `json:"state"`
 			Repository struct {
 				FullName string `json:"full_name"`
 			} `json:"repository"`
@@ -229,13 +229,13 @@ func (c *Client) getReviews(username string, startDate, endDate time.Time) ([]ty
 	var activities []types.GitHubActivity
 
 	// Search for pull requests reviewed by user
-	query := fmt.Sprintf("reviewed-by:%s created:%s..%s", 
+	query := fmt.Sprintf("reviewed-by:%s created:%s..%s",
 		username, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
 
 	var searchResult struct {
 		Items []struct {
-			Number int    `json:"number"`
-			Title  string `json:"title"`
+			Number     int    `json:"number"`
+			Title      string `json:"title"`
 			Repository struct {
 				FullName string `json:"full_name"`
 			} `json:"repository"`

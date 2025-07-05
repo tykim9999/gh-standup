@@ -6,19 +6,19 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
+	"github.com/cli/go-gh/v2/pkg/auth"
 	"github.com/gh-standup/internal/types"
 )
 
 type Request struct {
-	Messages      []Message `json:"messages"`
-	Model         string    `json:"model"`
-	Temperature   float64   `json:"temperature"`
-	TopP          float64   `json:"top_p"`
-	Stream        bool      `json:"stream"`
+	Messages    []Message `json:"messages"`
+	Model       string    `json:"model"`
+	Temperature float64   `json:"temperature"`
+	TopP        float64   `json:"top_p"`
+	Stream      bool      `json:"stream"`
 }
 
 type Message struct {
@@ -40,10 +40,13 @@ type Client struct {
 
 func NewClient() (*Client, error) {
 	fmt.Print("  Checking GitHub token... ")
-	token := os.Getenv("GITHUB_TOKEN")
+
+	host, _ := auth.DefaultHost()
+	token, _ := auth.TokenForHost(host) // check GH_TOKEN, GITHUB_TOKEN, keychain, etc
+
 	if token == "" {
 		fmt.Println("Failed")
-		return nil, fmt.Errorf("GITHUB_TOKEN environment variable is not set")
+		return nil, fmt.Errorf("No GitHub token found. Please run 'gh auth login' to authenticate.")
 	}
 	fmt.Println("Done")
 
@@ -109,7 +112,7 @@ func (c *Client) formatActivitiesForLLM(activities []types.GitHubActivity) strin
 	}
 
 	var builder strings.Builder
-	
+
 	commits := make([]types.GitHubActivity, 0)
 	prs := make([]types.GitHubActivity, 0)
 	issues := make([]types.GitHubActivity, 0)
