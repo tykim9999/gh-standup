@@ -38,20 +38,17 @@ gh standup
 ### Advanced Options
 
 ```bash
+# Look back multiple days
+gh standup --days 3
+
 # Generate report for specific user
 gh standup --user octocat
 
 # Generate report for specific repository
 gh standup --repo owner/repo
 
-# Look back multiple days
-gh standup --days 3
-
 # Use a different AI model
 gh standup --model xai/grok-3-mini
-
-# Combine options
-gh standup --user octocat --repo microsoft/vscode --days 2 --model openai/gpt-4o
 ```
 
 ## Contributing
