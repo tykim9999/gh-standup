@@ -1,32 +1,29 @@
 # gh-standup
 
-A GitHub CLI extension that generates AI-powered standup reports using GitHub activity data.
+A GitHub CLI extension that generates AI-powered standup reports using GitHub activity data. It uses free [GitHub Models](https://docs.github.com/en/github-models) for inference.
 
 ## Installation
+
+```bash
+gh extension install sgoedecke/gh-standup
+gh standup
+```
+
+### Organizations
+
+To ensure the GitHub CLI can access your organization's data:
+
+```bash
+# Authenticate with GitHub CLI (if not already done)
+gh auth login
+
+# Authenticate with your organizations
+gh auth refresh -h github.com -s read:org
+```
 
 ### Prerequisites
 
 - [GitHub CLI](https://cli.github.com/) installed and authenticated
-- Go 1.21+ (for building from source)
-- GitHub token with appropriate permissions (automatically used by GitHub CLI)
-
-### Install from Source
-
-```bash
-# Clone the repository
-git clone https://github.com/sgoedecke/gh-standup.git
-cd gh-standup
-
-# Build and install
-make build
-gh extension install .
-```
-
-### Install from GitHub
-
-```bash
-gh extension install sgoedecke/gh-standup
-```
 
 ## Usage
 
@@ -57,20 +54,8 @@ gh standup --model xai/grok-3-mini
 gh standup --user octocat --repo microsoft/vscode --days 2 --model openai/gpt-4o
 ```
 
-## Authentication with Organizations
+## Contributing
 
-To ensure the extension can access your organization repositories and activities:
+Contributions are welcome. In particular, I encourage tweaking of the [prompt](https://github.com/sgoedecke/gh-standup/blob/main/internal/llm/standup.prompt.yml). Since I've extracted it into a file, you should be able to fork the repo and iterate on the prompt via the GitHub Models UI:
 
-```bash
-# Authenticate with GitHub CLI (if not already done)
-gh auth login
-
-# Authenticate with your organizations
-gh auth refresh -h github.com -s read:org
-
-# To authenticate with a GitHub Enterprise instance
-gh auth login --hostname your-enterprise-instance.com
-gh auth refresh -h your-enterprise-instance.com -s read:org
-```
-
-This ensures your GitHub token includes the necessary organization access permissions.
+`https://github.com/[your-username]/gh-standup/models/prompt/compare/main/internal/llm/standup.prompt.yml`
